@@ -1,5 +1,6 @@
 import { useAuthStore } from "@/src/features/auth/store/useAuthStore";
 import { getBalanceService } from "@/src/features/balance/services/balance.service";
+import { formattedAmount } from "@/src/shared/utils/formattedAmount";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -15,6 +16,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
 
   useEffect(() => {
     const fetchBalance = async () => {
@@ -31,11 +33,10 @@ export default function Home() {
     fetchBalance();
   }, []);
 
-  const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(value);
+  const handleLogout = async () => {
+    await logout();
+    router.replace("/(auth)/login");
+  };
 
   if (loading) {
     return (
@@ -47,15 +48,20 @@ export default function Home() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.greeting}>
-        Bienvenido(a){user ? `, ${user.name}` : ""}
-      </Text>
+      <View style={styles.headerContainer}>
+        <Text style={styles.greeting}>
+          Bienvenido(a){user ? `, ${user.name}` : ""}
+        </Text>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutButtonText}>Salir</Text>
+        </TouchableOpacity>
+      </View>
 
       <View style={styles.balanceCard}>
         <Text style={styles.balanceLabel}>Saldo disponible</Text>
 
         <Text style={styles.balanceValue}>
-          {balance !== null ? formatCurrency(balance) : "--"}
+          {balance !== null ? formattedAmount(balance) : "--"}
         </Text>
       </View>
 
@@ -91,9 +97,30 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
+  headerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+
   greeting: {
     fontSize: 18,
     color: "#6B7280",
+    flex: 1,
+  },
+
+  logoutButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: "#EF4444",
+    borderRadius: 8,
+  },
+
+  logoutButtonText: {
+    color: "#FFFFFF",
+    fontWeight: "600",
+    fontSize: 14,
   },
 
   balanceCard: {

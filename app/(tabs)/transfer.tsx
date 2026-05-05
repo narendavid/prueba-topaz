@@ -1,18 +1,20 @@
 import { transferService } from "@/src/features/transfer/services/transfer.service";
 import { useState } from "react";
 import {
-  Alert,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+	ActivityIndicator,
+	Alert,
+	StyleSheet,
+	Text,
+	TextInput,
+	TouchableOpacity,
+	View,
 } from "react-native";
 
 export default function Transfer() {
   const [value, setValue] = useState("");
   const [document, setDocument] = useState("");
   const [date, setDate] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleTransfer = async () => {
     if (!value || !document || !date) {
@@ -21,6 +23,7 @@ export default function Transfer() {
     }
 
     try {
+      setLoading(true);
       await transferService({
         value: Number(value),
         currency: "USD",
@@ -36,6 +39,8 @@ export default function Transfer() {
     } catch (error) {
       console.log(error);
       Alert.alert("Error", "No se pudo realizar la transferencia");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -65,8 +70,16 @@ export default function Transfer() {
         style={styles.input}
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleTransfer}>
-        <Text style={styles.buttonText}>Enviar</Text>
+      <TouchableOpacity
+        style={[styles.button, loading && styles.buttonDisabled]}
+        onPress={handleTransfer}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>Enviar</Text>
+        )}
       </TouchableOpacity>
     </View>
   );
@@ -99,6 +112,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     marginTop: 10,
+  },
+
+  buttonDisabled: {
+    opacity: 0.6,
   },
 
   buttonText: {

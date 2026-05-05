@@ -1,3 +1,4 @@
+import { formattedAmount } from "@/src/shared/utils/formattedAmount";
 import { StyleSheet, Text, View } from "react-native";
 import { Transfer } from "../types/transfer";
 
@@ -6,11 +7,6 @@ interface Props {
 }
 
 export const TransferItem = ({ item }: Props) => {
-  const formattedAmount = new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: item.currency || "COP",
-  }).format(item.value);
-
   const formattedDate = new Date(item.date).toLocaleDateString("es-CO", {
     year: "numeric",
     month: "short",
@@ -21,7 +17,7 @@ export const TransferItem = ({ item }: Props) => {
     <View style={styles.card}>
       <View style={styles.rowBetween}>
         <Text style={styles.name}>{item.payeer.name}</Text>
-        <Text style={styles.amount}>{formattedAmount}</Text>
+        <Text style={styles.amount}>{formattedAmount(item.value)}</Text>
       </View>
 
       <View style={styles.infoContainer}>
