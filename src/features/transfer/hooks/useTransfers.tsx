@@ -50,7 +50,7 @@ export const useTransfers = () => {
 
   useEffect(() => {
     applyFilters();
-  }, [filters]);
+  }, [filters, transfers]);
 
   return {
     transfers: filtered,
