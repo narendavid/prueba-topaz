@@ -11,7 +11,7 @@ interface AuthState {
   user: User | null;
   token: string | null;
   isInitialized: boolean;
-  setAuth: (user: User, token: string) => void;
+  setAuth: (user: User, token: string) => Promise<void>;
   logout: () => Promise<void>;
   initializeAuth: () => Promise<void>;
 }
